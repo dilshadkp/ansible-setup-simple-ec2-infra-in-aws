@@ -1,0 +1,63 @@
+---
+- name: "Create EC2 instance with a keypair and Security Group"
+  hosts: localhost
+  vars_files:
+    - variables.vars
+  tasks:
+##################################SSH KEY CREATION######################################
+    - name: "SSH keypair creation. Keyname is {{key_name}}"
+      ec2_key:
+        region: "{{region}}"
+        name: "{{key_name}}"
+        state: present
+      register: "key_info"
+##################################COPY PRIVATE KEY#####################################
+    - name: "copy private key to local server"
+      when: key_info.changed == true
+      copy:
+        content: "{{key_info.key.private_key}}"
+        dest: "./{{key_name}}.pem"
+        mode: "0400"
+##################################SECURITY GROUP CREATION#################################
+    - name: "Create Security group"
+      ec2_group:
+        region: "{{region}}"
+        name: "{{sg_name}}"
+        description: "secuirty group for devops instance"
+        tags:
+          Name: "{{server_name}}-sg"          
+        rules:
+          - proto: tcp
+            ports:
+              - 80
+              - 443
+              - 22
+            cidr_ip: 0.0.0.0/0
+            cidr_ipv6: ::/0
+            rule_desc: "allow all on ports 80, 443 and 22"
+        rules_egress:
+          - proto: -1
+            ports: -1
+            cidr_ip: 0.0.0.0/0
+            cidr_ipv6: ::/0
+      register: "sg_info"
+
+##################################CREATE EC2###########################################
+    - name: "Create EC2"
+      ec2:
+        region: "{{region}}"
+        key_name: "{{key_info.key.name}}"
+        instance_type: "{{type}}"
+        image: "{{ami_id}}"
+        wait: yes
+        group_id: "{{sg_info.group_id}}"
+        instance_tags:
+          Name: "{{server_name}}"
+        count_tag:
+          Name: "{{server_name}}"
+        exact_count: 1
+      register: ec2_info
+##################################PRINT PUBLIC IPs############################
+    - name: "Print Public IP of Instance"
+      debug:
+        msg: "PUBLIC IP OF {{ec2_info.tagged_instances[0].id}} : {{ec2_info.tagged_instances[0].public_ip}}"
