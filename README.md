@@ -4,7 +4,7 @@
 
 This is a simple Ansible Playbook to launch an AWS EC2 instace along with a new key pair and a security group.
 
-This Playbook will run in the Ansible Master machine itselt(localhost) since this task do not involves any remove clients.
+This Playbook will run in the Ansible Master machine itself(localhost) since this task do not involves any remove clients.
 
 You need to put values for below variables in varialbes.vars file as per your requirement.
 
