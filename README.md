@@ -20,16 +20,16 @@ You need to put values for below variables in varialbes.vars file as per your re
 
 - Install Ansible in Ansible Master server. [Click here for Ansible Installation steps](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
 
-- ## Ansible Modules used in this Playbook
+ ## Ansible Modules used in this Playbook
 - [ec2_key](https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_key_module.html)
 - [copy](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html)
 - [ec2_group](https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_group_module.html)
 - [ec2](https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_module.html)
 - [debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html)
 
-- ## Tasks defined in the Playbook
+ ## Tasks defined in the Playbook
 
-- #### Task 1
+ #### Task 1
 
 >This task will create a new SSH Keypair in the given region with given name.
 >Also, stores the output of this task to a variable ***key_info***
@@ -43,7 +43,7 @@ You need to put values for below variables in varialbes.vars file as per your re
       register: "key_info"
 ```
 
-- #### Task 2
+ #### Task 2
 
 >Copy the private key(pem) of the created keypair to the current path of Ansible Master machine as name {{key_name}}.pem.
 >Then change the permissions of key file to *0400(r--------)*
@@ -57,7 +57,7 @@ You need to put values for below variables in varialbes.vars file as per your re
         dest: "./{{key_name}}.pem"
         mode: "0400"
 ```
-- #### Task 3
+ #### Task 3
 
 >This task will create security group with inbound rules to open ports 80.443 and 22 to all IPv4 nad IPv6 IPs and outbound rules to open all ports to all IPv4 and IPv6 IPs.
 >Also, stores the output of this task to a variable ***sg_info***
@@ -89,7 +89,7 @@ You need to put values for below variables in varialbes.vars file as per your re
 
 ```
 
-- #### Task 4
+ #### Task 4
 
 >This task will create an EC2 instance in the given region with given AMI, instance type.
 >Public key of above created SSH keypair will be added to this EC2 instance.
@@ -112,7 +112,7 @@ You need to put values for below variables in varialbes.vars file as per your re
         exact_count: 1
       register: ec2_info
 ```
-- #### Task 5
+ #### Task 5
 
 >This task will print the Public IP along with the instance ID of the created EC2 instance.
 
@@ -122,7 +122,7 @@ You need to put values for below variables in varialbes.vars file as per your re
         msg: "PUBLIC IP OF {{ec2_info.tagged_instances[0].id}} : {{ec2_info.tagged_instances[0].public_ip}}"
 ```
 
-- ## Execution
+ ## Execution
  - Put the Playbook in the Ansible Master server working directory.
  - Run a syntax check
  ```bash
@@ -132,7 +132,7 @@ ansible-playbook main.yml --syntax-check
  ```bash
 ansible-playbook main.yml
 ```
-- ## Sample Output
+ ## Sample Output
 
 ![](https://i.ibb.co/QKLHrMZ/execution.png)
 
